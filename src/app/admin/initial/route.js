@@ -1,0 +1,19 @@
+import { ensureIndexes } from "@/lib/ensureIndexes";
+import { NextResponse } from "next/server";
+
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const challenge = searchParams.get("pass") ?? false;
+  const pass = process.env.ADMIN_SETUP_PASS;
+
+  if (!challenge) {
+    return NextResponse.json({ message: "Invalid usage" }, { status: 400 });
+  }
+
+  if (challenge !== pass) {
+    return NextResponse.json({ message: "Admin password incorrect" }, { status: 400 });
+  }
+
+  await ensureIndexes();
+  return NextResponse.json({ message: "Indexes ensured and test users prepared" });
+}
